@@ -14,6 +14,10 @@ export class User {
   @Prop({ required: true, unique: true, type: String })
   phoneNumber: string;
 
+
+  @Prop({ required: true, unique: true, type: String })
+  password: string;
+
   @Prop({ default: false })
   isVerified: boolean;
 

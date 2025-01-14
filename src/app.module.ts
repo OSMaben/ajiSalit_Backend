@@ -6,11 +6,10 @@ import { CommandModule } from './command/command.module';
 import { UserModule } from './user/user.module';
 import { NotificationsModule } from './notifications/notifications.module';
 
+
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true 
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot('mongodb://localhost:27017/Aji-Salit'),
     CompanyModule,
     CommandModule,
