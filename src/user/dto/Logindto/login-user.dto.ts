@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, Matches,IsEnum } from "class-validator";
+import { IsNotEmpty, IsString, Matches } from "class-validator";
 
 export class LoginUserDto {
 
@@ -9,5 +9,9 @@ export class LoginUserDto {
     })
     phoneNumber: string;
 
+
+    @IsString()
+    @IsNotEmpty()
+    password: string;
 
 }

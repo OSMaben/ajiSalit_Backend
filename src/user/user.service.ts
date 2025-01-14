@@ -8,6 +8,8 @@ import { LoginUserDto } from './dto/Logindto/login-user.dto';
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 dotenv.config();
+import * as bcrypt from 'bcrypt';
+
 
 
 @Injectable()
@@ -68,7 +70,7 @@ export class UserService {
 
   async register(createUserDto:CreateUserDto) {
     try {
-      const { name, phoneNumber, role } = createUserDto;
+      const { name, phoneNumber, role, password } = createUserDto;
 
       const existingUser = await this.userModel.findOne({ phoneNumber }).exec();
       if (existingUser) {
@@ -79,10 +81,16 @@ export class UserService {
       const otpExpiry = new Date();
       otpExpiry.setMinutes(otpExpiry.getMinutes() + 10);
 
+
+
+      const saltRounds = 10;
+
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
       const newUser = new this.userModel({
         name,
         phoneNumber,
         role,
+        password:hashedPassword,
         isVerified: false,
         otp,
         otpExpiry
@@ -140,7 +148,7 @@ export class UserService {
 
 
  async login(LoginUserDto:LoginUserDto):Promise<any>{
-    const { phoneNumber } = LoginUserDto;
+    const { phoneNumber, password } = LoginUserDto;
     const User = await this.userModel.findOne({phoneNumber}).exec()
 
     if(!User)
@@ -150,6 +158,11 @@ export class UserService {
       throw new BadRequestException('Phone number not verified');
     }
 
+    const isPasswordValid =  await bcrypt.compare(password,User.password)
+
+    if (!isPasswordValid) {
+      throw new Error('Password incorrect');
+    }
     const secretKey = process.env.JWT_SECRET;
     console.log(secretKey); 
    try
