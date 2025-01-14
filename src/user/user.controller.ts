@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,9 +7,22 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  
+  // createUser(@Body() createUserDto: CreateUserDto) {
+  //   return this.userService.create(createUserDto);
+  // }
+
+  @Post('register')
+  async register(@Body(ValidationPipe) CreateUserDto: CreateUserDto) {
+    return this.userService.register(CreateUserDto);
+  }
+
+  @Post('verify')
+  async verifyOTP(
+    @Body('phoneNumber') phoneNumber: string,
+    @Body('otp') otp: string,
+  ) {
+    return this.userService.verifyOTP(phoneNumber, otp);
   }
 
   @Get()
