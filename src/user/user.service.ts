@@ -5,13 +5,15 @@ import { User, UserDocument } from './entities/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { https } from 'follow-redirects';
 import { LoginUserDto } from './dto/Logindto/login-user.dto';
-
+import * as jwt from 'jsonwebtoken';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   private async sendSMS(phoneNumber: string, message: string) {
@@ -137,10 +139,42 @@ export class UserService {
 
 
 
-  login(LoginUserDto:LoginUserDto):Promise<User>{
-    return `This action returns all users`;
+ async login(LoginUserDto:LoginUserDto):Promise<any>{
+    const { phoneNumber } = LoginUserDto;
+    const User = await this.userModel.findOne({phoneNumber}).exec()
 
-  }
+    if(!User)
+      throw new BadRequestException("This User Does not exists")
+
+    if (!User.isVerified) {
+      throw new BadRequestException('Phone number not verified');
+    }
+
+    const secretKey = process.env.JWT_SECRET;
+    console.log(secretKey); 
+   try
+    {
+      const token = jwt.sign(
+        {
+          id: User._id,
+          phoneNumber: User.phoneNumber,
+          role: User.role,
+        },
+          secretKey,
+        { expiresIn: '1h' }
+      )
+
+      return {
+        message: 'Login successful',
+        User,
+        token,
+      };
+    }catch(error)
+    {
+      throw new BadRequestException("There was an error what login")
+    }
+    
+  } 
 
 
 
