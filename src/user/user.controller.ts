@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete,ValidationPipe } from
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginUserDto } from './dto/Logindto/login-user.dto';
+ 
 
 @Controller('user')
 export class UserController {
@@ -23,6 +25,12 @@ export class UserController {
     @Body('otp') otp: string,
   ) {
     return this.userService.verifyOTP(phoneNumber, otp);
+  }
+
+
+  @Post('login')
+  async login(@Body(ValidationPipe) LoginUserDto: LoginUserDto) {
+    return this.userService.login(LoginUserDto);
   }
 
   @Get()

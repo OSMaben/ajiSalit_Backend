@@ -4,6 +4,9 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from './entities/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { https } from 'follow-redirects';
+import { LoginUserDto } from './dto/Logindto/login-user.dto';
+
+
 
 @Injectable()
 export class UserService {
@@ -130,6 +133,13 @@ export class UserService {
     await user.save();
 
     return { message: 'Phone number verified successfully' };
+  }
+
+
+
+  login(LoginUserDto:LoginUserDto):Promise<User>{
+    return `This action returns all users`;
+
   }
 
 
