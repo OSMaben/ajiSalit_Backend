@@ -147,47 +147,46 @@ export class UserService {
 
 
 
- async login(LoginUserDto:LoginUserDto):Promise<any>{
+  async login(LoginUserDto: LoginUserDto): Promise<any> {
     const { phoneNumber, password } = LoginUserDto;
-    const User = await this.userModel.findOne({phoneNumber}).exec()
-
-    if(!User)
-      throw new BadRequestException("This User Does not exists")
-
+    const User = await this.userModel.findOne({phoneNumber}).exec();
+  
+    if (!User) {
+      throw new BadRequestException("This User Does not exists");
+    }
+  
     if (!User.isVerified) {
       throw new BadRequestException('Phone number not verified');
     }
-
-    const isPasswordValid =  await bcrypt.compare(password,User.password)
-
+  
+    const isPasswordValid = await bcrypt.compare(password, User.password);
+  
     if (!isPasswordValid) {
-      throw new Error('Password incorrect');
+      throw new BadRequestException('Password incorrect'); // Changed from Error to BadRequestException
     }
+  
     const secretKey = process.env.JWT_SECRET;
-    console.log(secretKey); 
-   try
-    {
+    
+    try {
       const token = jwt.sign(
         {
           id: User._id,
           phoneNumber: User.phoneNumber,
           role: User.role,
         },
-          secretKey,
+        secretKey,
         { expiresIn: '1h' }
-      )
-
+      );
+  
       return {
         message: 'Login successful',
         User,
         token,
       };
-    }catch(error)
-    {
-      throw new BadRequestException("There was an error what login")
+    } catch(error) {
+      throw new BadRequestException("There was an error while login");
     }
-    
-  } 
+  }
 
 
 
